@@ -1,0 +1,3 @@
+*.class
+target/classes
+.DS_Store
