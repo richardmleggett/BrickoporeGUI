@@ -5,6 +5,7 @@
  */
 package richardmleggett.brickopore;
 
+import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Toolkit;
@@ -28,6 +29,7 @@ import java.util.logging.Logger;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -38,6 +40,8 @@ public class Brickopore extends javax.swing.JFrame {
     private String prefsFile = System.getProperty("user.home") + File.separator + ".brickopore.prefs";
     private BrickoporeServer server=null;
     private String urlDir = "";
+    private boolean scientistsAreCheering = false;
+    private boolean debugEnabled = false;
     
     /**
      * Creates new form JLegoPore
@@ -48,6 +52,9 @@ public class Brickopore extends javax.swing.JFrame {
         this.setPreferredSize(new Dimension(1000,800));
         System.out.println(scientistsLabel.getIcon());
         readOptions();
+        if (debugEnabled == false) {
+            debugButton.setVisible(false);
+        }
     }
 
     /**
@@ -77,18 +84,19 @@ public class Brickopore extends javax.swing.JFrame {
         portTextField = new javax.swing.JTextField();
         startButton = new javax.swing.JButton();
         stopButton = new javax.swing.JButton();
-        sequenceButton = new javax.swing.JButton();
         alignButton = new javax.swing.JButton();
         nudgeBackButton = new javax.swing.JButton();
         nudgeFwdButton = new javax.swing.JButton();
         blastButton = new javax.swing.JButton();
-        cheerButton = new javax.swing.JButton();
-        standButton = new javax.swing.JButton();
         saveURLButton = new javax.swing.JButton();
+        debugButton = new javax.swing.JButton();
+        beeTrailCheckbox = new javax.swing.JCheckBox();
         signalPanel1 = new richardmleggett.brickopore.SignalPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
         scientistsLabel = new javax.swing.JLabel();
         brickoporeLabel = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        sequenceButton = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
@@ -114,13 +122,6 @@ public class Brickopore extends javax.swing.JFrame {
         stopButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 stopButtonActionPerformed(evt);
-            }
-        });
-
-        sequenceButton.setText("Sequence");
-        sequenceButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                sequenceButtonActionPerformed(evt);
             }
         });
 
@@ -152,24 +153,25 @@ public class Brickopore extends javax.swing.JFrame {
             }
         });
 
-        cheerButton.setText("Cheer");
-        cheerButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cheerButtonActionPerformed(evt);
-            }
-        });
-
-        standButton.setText("Stand");
-        standButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                standButtonActionPerformed(evt);
-            }
-        });
-
         saveURLButton.setText("Save URL");
         saveURLButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveURLButtonActionPerformed(evt);
+            }
+        });
+
+        debugButton.setText("Debug");
+        debugButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                debugButtonActionPerformed(evt);
+            }
+        });
+
+        beeTrailCheckbox.setSelected(true);
+        beeTrailCheckbox.setText("Bee trail");
+        beeTrailCheckbox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                beeTrailCheckboxActionPerformed(evt);
             }
         });
 
@@ -186,8 +188,6 @@ public class Brickopore extends javax.swing.JFrame {
                 .addComponent(startButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(stopButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(sequenceButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(alignButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -195,14 +195,14 @@ public class Brickopore extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(nudgeFwdButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(cheerButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(standButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(blastButton)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(saveURLButton)
-                .addContainerGap())
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(beeTrailCheckbox)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(debugButton)
+                .addContainerGap(383, Short.MAX_VALUE))
         );
         buttonPanelLayout.setVerticalGroup(
             buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -213,14 +213,13 @@ public class Brickopore extends javax.swing.JFrame {
                     .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(startButton)
                     .addComponent(stopButton)
-                    .addComponent(sequenceButton)
                     .addComponent(alignButton)
                     .addComponent(nudgeBackButton)
                     .addComponent(nudgeFwdButton)
                     .addComponent(blastButton)
-                    .addComponent(cheerButton)
-                    .addComponent(standButton)
-                    .addComponent(saveURLButton))
+                    .addComponent(saveURLButton)
+                    .addComponent(debugButton)
+                    .addComponent(beeTrailCheckbox))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -243,8 +242,37 @@ public class Brickopore extends javax.swing.JFrame {
         );
 
         scientistsLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sci3.png"))); // NOI18N
+        scientistsLabel.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                scientistsLabelMouseClicked(evt);
+            }
+        });
 
         brickoporeLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/brickopore5.png"))); // NOI18N
+
+        sequenceButton.setText("Sequence");
+        sequenceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                sequenceButtonActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(sequenceButton)
+                .addContainerGap())
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(sequenceButton)
+                .addContainerGap())
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -259,9 +287,13 @@ public class Brickopore extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(scientistsLabel))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 69, Short.MAX_VALUE)
+                .addGap(0, 0, Short.MAX_VALUE)
                 .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(74, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -270,7 +302,9 @@ public class Brickopore extends javax.swing.JFrame {
                 .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 93, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scientistsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -281,65 +315,11 @@ public class Brickopore extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
+    private void scientistsLabelMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_scientistsLabelMouseClicked
         // TODO add your handling code here:
-    }//GEN-LAST:event_portTextFieldActionPerformed
+        toggleMiniFigureState();
 
-    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
-        int port = Integer.parseInt(portTextField.getText());
-        System.out.println("Got port "+port);
-        startButton.setEnabled(false);
-        stopButton.setEnabled(true);
-        server = new BrickoporeServer(this, port);
-        server.start();
-        signalPanel1.setServer(server);
-    }//GEN-LAST:event_startButtonActionPerformed
-
-    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
-        server.terminate();
-        stopButton.setEnabled(false);
-        startButton.setEnabled(true);
-    }//GEN-LAST:event_stopButtonActionPerformed
-
-    private void sequenceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequenceButtonActionPerformed
-        // TODO add your handling code here:
-        setSequenceButtonEnabled(false);
-
-        server.sequenceClicked();
-    }//GEN-LAST:event_sequenceButtonActionPerformed
-
-    private void alignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignButtonActionPerformed
-        server.alignClicked();
-        // TODO add your handling code here:
-    }//GEN-LAST:event_alignButtonActionPerformed
-
-    private void nudgeBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeBackButtonActionPerformed
-        server.nudgeBackClicked();
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nudgeBackButtonActionPerformed
-
-    private void nudgeFwdButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeFwdButtonActionPerformed
-        server.nudgeFwdClicked();
-        // TODO add your handling code here:
-    }//GEN-LAST:event_nudgeFwdButtonActionPerformed
-
-    private void blastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blastButtonActionPerformed
-        try {
-            java.awt.Desktop.getDesktop().browse(new URI("https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY="+server.getRead()));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }//GEN-LAST:event_blastButtonActionPerformed
-
-    private void cheerButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cheerButtonActionPerformed
-        // TODO add your handling code here:
-        setMiniFigureState(true);
-    }//GEN-LAST:event_cheerButtonActionPerformed
-
-    private void standButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_standButtonActionPerformed
-        // TODO add your handling code here:
-        setMiniFigureState(false);
-    }//GEN-LAST:event_standButtonActionPerformed
+    }//GEN-LAST:event_scientistsLabelMouseClicked
 
     private void saveURLButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveURLButtonActionPerformed
         JFileChooser jfc = new JFileChooser();
@@ -358,15 +338,15 @@ public class Brickopore extends javax.swing.JFrame {
             if (!pathname.endsWith(".url")) {
                 pathname = pathname + ".url";
             }
-            
+
             try {
-                PrintWriter pw = new PrintWriter(new FileWriter(pathname)); 
+                PrintWriter pw = new PrintWriter(new FileWriter(pathname));
                 String read = "NNNNNNNNNN";
-                
+
                 if (server != null) {
                     read = server.getRead();
                 }
-                
+
                 pw.println("[InternetShortcut]");
                 pw.println("URL=https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY="+read);
                 pw.close();
@@ -375,16 +355,89 @@ public class Brickopore extends javax.swing.JFrame {
                 e.printStackTrace();
                 System.exit(1);
             }
-            
+
             writeOptions();
         }
     }//GEN-LAST:event_saveURLButtonActionPerformed
 
+    private void blastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blastButtonActionPerformed
+        try {
+            java.awt.Desktop.getDesktop().browse(new URI("https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY="+server.getRead()));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_blastButtonActionPerformed
+
+    private void nudgeFwdButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeFwdButtonActionPerformed
+        server.nudgeFwdClicked();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nudgeFwdButtonActionPerformed
+
+    private void nudgeBackButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_nudgeBackButtonActionPerformed
+        server.nudgeBackClicked();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_nudgeBackButtonActionPerformed
+
+    private void alignButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_alignButtonActionPerformed
+        server.alignClicked();
+        // TODO add your handling code here:
+    }//GEN-LAST:event_alignButtonActionPerformed
+
+    private void sequenceButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_sequenceButtonActionPerformed
+        // TODO add your handling code here:
+        setSequenceButtonEnabled(false);
+
+        if (server == null) {
+            System.out.println("ERROR!");
+        }
+        
+        server.sequenceClicked(beeTrailCheckbox.isSelected());
+    }//GEN-LAST:event_sequenceButtonActionPerformed
+
+    private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
+        server.terminate();
+        stopButton.setEnabled(false);
+        startButton.setEnabled(true);
+    }//GEN-LAST:event_stopButtonActionPerformed
+
+    private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
+        int port = Integer.parseInt(portTextField.getText());
+        System.out.println("Got port "+port);
+        startButton.setEnabled(false);
+        stopButton.setEnabled(true);
+        server = new BrickoporeServer(this, port);
+        server.start();
+        signalPanel1.setServer(server);
+    }//GEN-LAST:event_startButtonActionPerformed
+
+    private void portTextFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_portTextFieldActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_portTextFieldActionPerformed
+
+    private void debugButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugButtonActionPerformed
+        server = new BrickoporeServer(this);
+        server.start();
+        signalPanel1.setServer(server);
+    }//GEN-LAST:event_debugButtonActionPerformed
+
+    private void beeTrailCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_beeTrailCheckboxActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_beeTrailCheckboxActionPerformed
+
+    public void toggleMiniFigureState() {
+        if (scientistsAreCheering == true) {
+            setMiniFigureState(false);
+        } else {
+            setMiniFigureState(true);
+        }
+    }
+    
     public void setMiniFigureState(boolean cheering) {
         //String iconName = cheering ? "/Users/leggettr/Documents/NetBeansProjects/legopore/target/classes/sci4.png":"/Users/leggettr/Documents/NetBeansProjects/legopore/target/classes/sci3.png";
         //scientistsLabel.setIcon(new ImageIcon(iconName));
 
         scientistsLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(cheering ? "/sci4.png":"/sci3.png")));
+        scientistsAreCheering = cheering;
     }
     
     public void setSequenceButtonEnabled(boolean tf) {
@@ -426,6 +479,18 @@ public class Brickopore extends javax.swing.JFrame {
         }
     }
     
+    public void setDebugEnabled() {
+        debugEnabled = true;
+        debugButton.setVisible(true);
+    }
+    
+    public void showResults() {
+        ResultsDialog rd = new ResultsDialog(this, true);
+        rd.setSequence(server.getRead());
+        centreWindow(rd);
+        rd.show();
+    }
+    
     public static void main(String[] args) {
         Brickopore jlp = new Brickopore();
         
@@ -434,6 +499,14 @@ public class Brickopore extends javax.swing.JFrame {
         
         centreWindow(jlp);
         jlp.setVisible(true);
+        
+        if (args.length >= 1) {
+            if (args[0].equals("debug")) {
+                jlp.setDebugEnabled();
+            } else {
+                System.out.println("Unknown option "+args[0]);
+            }
+        }
         
         //if (args.length != 2) {
         //    System.out.println("Syntax: legopore <port>");
@@ -445,12 +518,14 @@ public class Brickopore extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton alignButton;
+    private javax.swing.JCheckBox beeTrailCheckbox;
     private javax.swing.JButton blastButton;
     private javax.swing.JLabel brickoporeLabel;
     private javax.swing.JPanel buttonPanel;
-    private javax.swing.JButton cheerButton;
+    private javax.swing.JButton debugButton;
     private javax.swing.Box.Filler filler1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JButton nudgeBackButton;
     private javax.swing.JButton nudgeFwdButton;
     private javax.swing.JTextField portTextField;
@@ -458,7 +533,6 @@ public class Brickopore extends javax.swing.JFrame {
     private javax.swing.JLabel scientistsLabel;
     private javax.swing.JButton sequenceButton;
     private richardmleggett.brickopore.SignalPanel signalPanel1;
-    private javax.swing.JButton standButton;
     private javax.swing.JButton startButton;
     private javax.swing.JButton stopButton;
     // End of variables declaration//GEN-END:variables

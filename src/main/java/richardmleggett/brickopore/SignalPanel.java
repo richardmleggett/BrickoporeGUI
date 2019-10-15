@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.awt.Font;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.util.ArrayList;
 import java.util.Queue;
 import java.util.Random;
@@ -25,7 +27,9 @@ public class SignalPanel extends JPanel {
     private int imageWidth = 505 * eventSize;
     private int imageHeight = (NUM_COLOURS * yScale) + yOffset + yOffset;
     private BufferedImage signalImage = new BufferedImage(imageWidth, imageHeight, BufferedImage.TYPE_INT_RGB);
-    private String sequence = "";
+    private String sequence = "";    
+    private boolean isBeeTrail = false;
+    private boolean showResult = false;
 
     public SignalPanel() {
         clearSignalPlot();
@@ -41,11 +45,13 @@ public class SignalPanel extends JPanel {
     
     public void clearSignalPlot() {
         Graphics g = signalImage.getGraphics();
+        Graphics2D g2 = (Graphics2D)g;
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, imageWidth, imageHeight);
         g.setColor(Color.BLACK);
         g.drawLine(xOffset, (NUM_COLOURS * yScale) + yOffset, imageWidth, (NUM_COLOURS * yScale) + yOffset);
         g.drawLine(xOffset, yOffset, xOffset, (NUM_COLOURS * yScale) + yOffset);
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);   
         for (int i=0; i<=NUM_COLOURS; i++) {
             int y = ((NUM_COLOURS - i) * yScale) + yOffset;
             g.drawLine(xOffset - 10, y, xOffset, y);
@@ -123,13 +129,13 @@ public class SignalPanel extends JPanel {
                 String base = sequence.substring(i, i+1);
                 
                 if (base.equals("A")) {
-                    g.setColor(Color.GREEN);
+                    g.setColor(BrickoporeServer.COLOR_A);
                 } else if (base.equals("C")) {
-                    g.setColor(Color.BLUE);
+                    g.setColor(BrickoporeServer.COLOR_C);
                 } else if (base.equals("G")) {
-                    g.setColor(new Color(0xEEEE00));
+                    g.setColor(BrickoporeServer.COLOR_G);
                 } else if (base.equals("T")) {
-                    g.setColor(Color.RED);
+                    g.setColor(BrickoporeServer.COLOR_T);
                 } else {
                     g.setColor(Color.BLACK);
                 }
@@ -137,10 +143,20 @@ public class SignalPanel extends JPanel {
                 g.drawString(base, xPos, imageHeight + 125);
                 xPos += 40;
             }
+            
+            
     }     
     
     public void setServer(BrickoporeServer s) {
         server = s;
         server.setSignalPanel(this);
+    }
+    
+    public void setIsBeeTrail(boolean t) {
+        isBeeTrail = t;
+    }
+    
+    public void setShowResult(boolean t) {
+        showResult = t;
     }
 }

@@ -36,10 +36,26 @@ public class BrickoporeServer extends Thread {
     byte[] out_buffer = new byte [256];
     boolean running = true;
     private int maxBufferSize = 20000;
-    private final static String colours[] = { "?", "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
-    private final static String colourCodes[] = { "??", "Bk", "Bl", "Gr", "Ye", "Re", "Wh", "Br" };
-    private final static String baseCodes [] = {"N", "N", "C", "A", "G", "T", "N", "N", "N"};
-    //private final static String baseCodes [] = {"N", "N", "A", "C", "G", "T", "N", "N", "N"};
+
+    /* Default colours
+    private final static String colours[] =     {"?",  "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
+    private final static String colourCodes[] = {"??", "Bk",    "Bl",   "Gr",    "Ye",     "Re",  "Wh",    "Br" };
+    private final static String baseCodes [] =  {"N",  "N",     "C",    "A",     "G",      "T",   "N",     "N",     "N"};
+    public final static Color COLOR_A = Color.GREEN;
+    public final static Color COLOR_T = Color.RED;
+    public final static Color COLOR_C = Color.BLUE;
+    public final static Color COLOR_G = new Color(0xEEEE00);
+    */
+    
+    // Bee trail colours
+    private final static String colours[] =     {"?",  "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
+    private final static String colourCodes[] = {"??", "Bk",    "Bl",   "Gr",    "Ye",     "Re",  "Wh",    "Br" };
+    private final static String baseCodes [] =  {"N",  "N",     "A",    "T",     "G",      "C",   "N",     "N",     "N"};
+    public final static Color COLOR_A = new Color(0x0000DD); //Color.BLUE; 
+    public final static Color COLOR_T = new Color(0x00DD00); //Color.GREEN;
+    public final static Color COLOR_C = new Color(0xDD0000); //Color.RED;
+    public final static Color COLOR_G = new Color(0xDDDD00);
+    
     private final static int COLOUR_BLUE = 2;
     private final static int COLOUR_GREEN = 3;
     private final static int COLOUR_YELLOW = 4;
@@ -57,7 +73,15 @@ public class BrickoporeServer extends Thread {
     private String read = "";
     private Brickopore parentFrame;
     private long cheeringStopTime = 0;
+    private long resultsTime = 0;
+    private boolean debugging=false;
 
+    public BrickoporeServer(Brickopore parent) {
+        parentFrame = parent;
+        debugging = true;
+        System.out.println("Debugging is true");
+    }
+    
     public BrickoporeServer(Brickopore parent, int p) {
         parentFrame = parent;
         port = p;
@@ -84,10 +108,30 @@ public class BrickoporeServer extends Thread {
         commandTerminate = true;
     }
     
-    public void sequenceClicked() {
+    public void sequenceClicked(boolean isBeeTrail) {
         System.out.println("Clicked sequence");
         signalPanel.clearSignalPlot();
+        signalPanel.setIsBeeTrail(isBeeTrail);
         commandSequence = true;
+        
+        if (debugging == true) {
+            Random rand = new Random();
+            int n = rand.nextInt(4);
+            if (n == 0) {
+                 read = "TGACCGAATTTCGCGGGCAATT";
+            } else if (n == 1) {
+                read = "TGACCGAATTTCGCGGGCCCAA";
+            } else if (n == 2) {
+                read = "TGACCGAATTTCGCGGTTAATT";
+            } else {
+                read = "TGACTGACTGACTGACTGACTG";
+            }
+            signalPanel.setSequence(read);
+            signalPanel.repaint();
+            parentFrame.setMiniFigureState(true);
+            cheeringStopTime = System.currentTimeMillis() + 3000;  
+            resultsTime = System.currentTimeMillis() + 1000;
+        }
     }
     
     public void alignClicked() {
@@ -110,108 +154,122 @@ public class BrickoporeServer extends Thread {
         boolean plottingSignal = false;
         System.out.println("Running on port "+port);
 
-        try {
-            server = new ServerSocket(port);
-            System.out.println("Server started");
+        try {    
+            DataInputStream in = null;
+            DataOutputStream out = null;
+            
+            if (debugging == false) {
+                server = new ServerSocket(port);
+                System.out.println("Server started");
 
-            System.out.println("Waiting for a client ...");
+                System.out.println("Waiting for a client ...");
 
-            socket = server.accept();
-            System.out.println("Client accepted");
+                socket = server.accept();
+                System.out.println("Client accepted");
 
-            // takes input from the client socket
-            DataInputStream in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
-            DataOutputStream out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+                // takes input from the client socket
+                in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
+                out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
+            }
             
             // reads message from client until "Over" is sent
             while (running) {
-                if (commandSequence) {
-                    System.out.println("Sending start sequence command");
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'S';
-                    out_buffer[2] = 'Q';
-                    out_buffer[3] = 0;
-                    out.write(out_buffer, 0, 4);
-                    out.flush();
-                    commandSequence = false;
-                    waitForSequence = true;
-                    whiteCount = 0;
-                    plottingSignal = false;
-                } else if (commandWhiteAlign) {
-                    System.out.println("Sending start align command");
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'F';
-                    out_buffer[2] = 'W';
-                    out_buffer[3] = 0;
-                    out.write(out_buffer, 0, 4);
-                    out.flush();
-                    commandWhiteAlign = false;
-                } else if (commandTerminate) {
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'E';
-                    out_buffer[2] = 'X';
-                    out_buffer[3] = 0;
-                    out.write(out_buffer, 0, 4);
-                    out.flush();
-                    commandTerminate = false;
-                    running = false;
-                } else if (commandNudgeBack) {
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'N';
-                    out_buffer[2] = 'B';
-                    out_buffer[3] = 9;
-                    out.write(out_buffer, 0, 4);
-                    out.flush();
-                    commandNudgeBack = false;
-                } else if (commandNudgeFwd) {
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'N';
-                    out_buffer[2] = 'F';
-                    out_buffer[3] = 9;
-                    out.write(out_buffer, 0, 4);
-                    out.flush();
-                    commandNudgeFwd = false;
-                }
-                                
-                if (waitForSequence) {
-                    try {
-                        int n = in.read(in_buffer, 0, 4);
-                        if (n > 0) {
-                            if (in_buffer[0] == '!') {
-                                if ((in_buffer[1] == 'S') && (in_buffer[2] == 'T')) {
-                                    System.out.println("GOT STOP");
-                                    waitForSequence = false;
-                                    doBaseCall();
-                                    System.out.println("Buffer size "+colourBuffer.size());
-                                    signalPanel.repaint();
-                                    colourBuffer.clear();
-                                    signalBuffer.clear();
-                                } else {                                    
-                                    if (in_buffer[2] == COLOUR_WHITE) {
-                                        if (!plottingSignal) {
-                                            whiteCount++;
+                if (debugging == false) {
+                    if (commandSequence) {
+                        System.out.println("Sending start sequence command");
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'S';
+                        out_buffer[2] = 'Q';
+                        out_buffer[3] = 0;
+                        out.write(out_buffer, 0, 4);
+                        out.flush();
+                        commandSequence = false;
+                        waitForSequence = true;
+                        whiteCount = 0;
+                        plottingSignal = false;
+                    } else if (commandWhiteAlign) {
+                        System.out.println("Sending start align command");
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'F';
+                        out_buffer[2] = 'W';
+                        out_buffer[3] = 0;
+                        out.write(out_buffer, 0, 4);
+                        out.flush();
+                        commandWhiteAlign = false;
+                    } else if (commandTerminate) {
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'E';
+                        out_buffer[2] = 'X';
+                        out_buffer[3] = 0;
+                        out.write(out_buffer, 0, 4);
+                        out.flush();
+                        commandTerminate = false;
+                        running = false;
+                    } else if (commandNudgeBack) {
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'N';
+                        out_buffer[2] = 'B';
+                        out_buffer[3] = 9;
+                        out.write(out_buffer, 0, 4);
+                        out.flush();
+                        commandNudgeBack = false;
+                    } else if (commandNudgeFwd) {
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'N';
+                        out_buffer[2] = 'F';
+                        out_buffer[3] = 9;
+                        out.write(out_buffer, 0, 4);
+                        out.flush();
+                        commandNudgeFwd = false;
+                    }
+
+                    if (waitForSequence) {
+                        try {
+                            int n = in.read(in_buffer, 0, 4);
+                            if (n > 0) {
+                                if (in_buffer[0] == '!') {
+                                    if ((in_buffer[1] == 'S') && (in_buffer[2] == 'T')) {
+                                        System.out.println("GOT STOP");
+                                        waitForSequence = false;
+                                        doBaseCall();
+                                        System.out.println("Buffer size "+colourBuffer.size());
+                                        signalPanel.repaint();
+                                        colourBuffer.clear();
+                                        signalBuffer.clear();
+                                    } else {                                    
+                                        if (in_buffer[2] == COLOUR_WHITE) {
+                                            if (!plottingSignal) {
+                                                whiteCount++;
+                                            }
+                                        } else {
+                                            if (whiteCount > 50) {
+                                                plottingSignal = true;
+                                            }
                                         }
-                                    } else {
-                                        if (whiteCount > 50) {
-                                            plottingSignal = true;
+
+                                        colourBuffer.add(new Integer(in_buffer[2]));
+
+                                        if (plottingSignal) {
+                                            signalPanel.plotSignal(colourBuffer.size()-whiteCount, in_buffer[2]);
                                         }
+
+                                        signalPanel.repaint();
                                     }
-                                    
-                                    colourBuffer.add(new Integer(in_buffer[2]));
-                                    
-                                    if (plottingSignal) {
-                                        signalPanel.plotSignal(colourBuffer.size()-whiteCount, in_buffer[2]);
-                                    }
-                                    
-                                    signalPanel.repaint();
                                 }
+                            } else {
+                                System.out.println("Packet didn't begin with ! character");
                             }
-                        } else {
-                            System.out.println("Packet didn't begin with ! character");
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                            System.exit(1);
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        System.exit(1);
+                    }
+                }
+                
+                if (resultsTime != 0) {
+                    if (System.currentTimeMillis() > resultsTime) {
+                        parentFrame.showResults();
+                        resultsTime = 0;
                     }
                 }
                 
@@ -219,6 +277,7 @@ public class BrickoporeServer extends Thread {
                     if (System.currentTimeMillis() > cheeringStopTime) {
                         parentFrame.setMiniFigureState(false);
                         parentFrame.setSequenceButtonEnabled(true);
+                        cheeringStopTime = 0;
                     }
                 }
                 
@@ -313,8 +372,8 @@ public class BrickoporeServer extends Thread {
 
         signalPanel.setSequence(read);
         parentFrame.setMiniFigureState(true);
-        cheeringStopTime = System.currentTimeMillis() + 3000;
-        
+        cheeringStopTime = System.currentTimeMillis() + 3000; 
+        resultsTime = System.currentTimeMillis() + 1000;
     }
     
     public ArrayList getColourBuffer() {
