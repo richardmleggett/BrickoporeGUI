@@ -75,8 +75,9 @@ public class BrickoporeServer extends Thread {
     private long cheeringStopTime = 0;
     private long resultsTime = 0;
     private long startedWaitingTime = 0;
+    private long lastActivity = 0;
     private boolean debugging=false;
-
+    
     public BrickoporeServer(Brickopore parent) {
         parentFrame = parent;
         debugging = true;
@@ -169,6 +170,7 @@ public class BrickoporeServer extends Thread {
                 socket = server.accept();
                 System.out.println("Client accepted");
 
+                socket.setSoTimeout(10000);
                 System.out.println("Timeout is set to " + socket.getSoTimeout());
                 
                 // takes input from the client socket
@@ -188,6 +190,7 @@ public class BrickoporeServer extends Thread {
                         out.write(out_buffer, 0, 4);
                         out.flush();
                         System.out.println("Sent command");
+                        lastActivity = System.currentTimeMillis();
                         commandSequence = false;
                         waitForSequence = true;
                         startedWaitingTime = System.currentTimeMillis();
@@ -202,6 +205,7 @@ public class BrickoporeServer extends Thread {
                         out.write(out_buffer, 0, 4);
                         out.flush();
                         System.out.println("Sent command");
+                        lastActivity = System.currentTimeMillis();
                         commandWhiteAlign = false;
                     } else if (commandTerminate) {
                         out_buffer[0] = '!';
@@ -218,7 +222,9 @@ public class BrickoporeServer extends Thread {
                         out_buffer[2] = 'B';
                         out_buffer[3] = 9;
                         out.write(out_buffer, 0, 4);
+                        System.out.println("Sent command");
                         out.flush();
+                        lastActivity = System.currentTimeMillis();
                         commandNudgeBack = false;
                     } else if (commandNudgeFwd) {
                         out_buffer[0] = '!';
@@ -227,6 +233,8 @@ public class BrickoporeServer extends Thread {
                         out_buffer[3] = 9;
                         out.write(out_buffer, 0, 4);
                         out.flush();
+                        System.out.println("Sent command");
+                        lastActivity = System.currentTimeMillis();
                         commandNudgeFwd = false;
                     }
 
@@ -299,6 +307,17 @@ public class BrickoporeServer extends Thread {
                         parentFrame.setSequenceButtonEnabled(true);
                         cheeringStopTime = 0;
                     }
+                }
+                
+                if (System.currentTimeMillis() > (lastActivity + 60000)) {
+                    out_buffer[0] = '!';
+                    out_buffer[1] = 'P';
+                    out_buffer[2] = 'G';
+                    out_buffer[3] = 9;
+                    out.write(out_buffer, 0, 4);
+                    System.out.println("Sent ping");
+                    out.flush();
+                    lastActivity = System.currentTimeMillis();
                 }
                 
                 try {
