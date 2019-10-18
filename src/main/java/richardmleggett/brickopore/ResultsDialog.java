@@ -163,8 +163,28 @@ public class ResultsDialog extends javax.swing.JDialog {
         return distance;
     }
     
+    private String reverseString(String s) {
+        String reverse = "";
+        for(int i = s.length() - 1; i >= 0; i--)
+        {
+            reverse = reverse + s.charAt(i);
+        }
+        return reverse;
+    }
+    
     public void setSequence(String s) {
         boolean perfect = false;        
+        boolean reversed = false;
+
+        /* If we don't start with TGA, maybe it's been put in the wrong way round? */
+        if (! s.startsWith("TGAC")) {
+            if (s.endsWith("CAGT")) {
+                s = reverseString(s);
+                reversed = true;
+                System.out.println("Reversed string");
+            }
+        }
+
         String start = s.substring(0, COMMON_SEQUENCE.length());
         String end = s.substring(COMMON_SEQUENCE.length());
         int h = findHamming(COMMON_SEQUENCE, start);
@@ -177,9 +197,17 @@ public class ResultsDialog extends javax.swing.JDialog {
                 
         if (h == 0) {
             perfect = true;
-            messageLabel.setText("is an exact match to...");
+            if (reversed == true) {
+                messageLabel.setText("is an exact REVERSED match to...");
+            } else {
+                messageLabel.setText("is an exact match to...");
+            }
         } else {
-            messageLabel.setText("is a CLOSE match to...");
+            if (reversed == true) {
+                messageLabel.setText("is a CLOSE REVERSED match to...");            
+            } else {
+                messageLabel.setText("is a CLOSE match to...");
+            }
         }
         
         if (h <= 2) {
@@ -193,7 +221,7 @@ public class ResultsDialog extends javax.swing.JDialog {
                 messageLabel.setText("");
                 imageLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/nomatch.png")));
             }
-        } else {
+        } else {            
             messageLabel.setText("");
             imageLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/nomatch.png")));
         }

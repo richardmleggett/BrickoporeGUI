@@ -118,7 +118,8 @@ public class BrickoporeServer extends Thread {
             Random rand = new Random();
             int n = rand.nextInt(4);
             if (n == 0) {
-                 read = "TGACCGAATTTCGCGGGCAATT";
+                 //read = "TGACCGAATTTCGCGGGCAATT";
+                 read = "TTAACGGGCGCTTTAAGCCAGT";
             } else if (n == 1) {
                 read = "TGACCGAATTTCGCGGGCCCAA";
             } else if (n == 2) {
