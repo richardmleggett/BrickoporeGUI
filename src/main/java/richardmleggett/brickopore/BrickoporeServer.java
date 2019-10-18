@@ -263,13 +263,16 @@ public class BrickoporeServer extends Thread {
                                 }
                             } else {
                                 // Check waiting too long
-                                if (System.currentTimeMillis() > (startedWaitingTime + 3000)) {
-                                    System.out.println("Something went wrong - no reply received in 3s. Trying to recover.");
-                                    waitForSequence = false;
-                                    parentFrame.setMiniFigureState(false);
-                                    parentFrame.setSequenceButtonEnabled(true);
-                                    cheeringStopTime = 0;
-                                    resultsTime = 0;
+                                if (startedWaitingTime > 0) {
+                                    if (System.currentTimeMillis() > (startedWaitingTime + 3000)) {
+                                        System.out.println("Something went wrong - no reply received in 3s. Trying to recover.");
+                                        waitForSequence = false;
+                                        parentFrame.setMiniFigureState(false);
+                                        parentFrame.setSequenceButtonEnabled(true);
+                                        cheeringStopTime = 0;
+                                        resultsTime = 0;
+                                        startedWaitingTime = 0;
+                                    }
                                 }
                             }
                         } catch (IOException e) {
@@ -379,14 +382,16 @@ public class BrickoporeServer extends Thread {
         System.out.println("");
         System.out.println("Read is: "+read);
                 
-        StringSelection stringSelection = new StringSelection(">seq\n"+read);
-        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-        clipboard.setContents(stringSelection, null);
-
-        signalPanel.setSequence(read);
+        if (read != "") {
+            StringSelection stringSelection = new StringSelection(">seq\n"+read);
+            Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+            clipboard.setContents(stringSelection, null);
+            signalPanel.setSequence(read);
+            resultsTime = System.currentTimeMillis() + 1000;
+        }
+        
         parentFrame.setMiniFigureState(true);
         cheeringStopTime = System.currentTimeMillis() + 4700; 
-        resultsTime = System.currentTimeMillis() + 1000;
     }
     
     public ArrayList getColourBuffer() {
