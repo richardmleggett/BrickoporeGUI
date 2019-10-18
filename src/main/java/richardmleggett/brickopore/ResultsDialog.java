@@ -184,7 +184,18 @@ public class ResultsDialog extends javax.swing.JDialog {
                 System.out.println("Reversed string");
             }
         }
-
+        
+        if (s.length() != 22) {
+            System.out.println("String is wrong size: "+s+" ("+s.length()+")");
+            
+            /* Check for too long sequence - chop off end if so */
+            if (s.length() > 22) {
+                System.out.println("Sequence too long: "+s);
+                s = s.substring(0,22);
+                System.out.println("       Chopped to: "+s);
+            }            
+        }
+        
         String start = s.substring(0, COMMON_SEQUENCE.length());
         String end = s.substring(COMMON_SEQUENCE.length());
         int h = findHamming(COMMON_SEQUENCE, start);
