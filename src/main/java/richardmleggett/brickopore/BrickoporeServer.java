@@ -74,6 +74,7 @@ public class BrickoporeServer extends Thread {
     private Brickopore parentFrame;
     private long cheeringStopTime = 0;
     private long resultsTime = 0;
+    private long startedWaitingTime = 0;
     private boolean debugging=false;
 
     public BrickoporeServer(Brickopore parent) {
@@ -186,6 +187,7 @@ public class BrickoporeServer extends Thread {
                         out.flush();
                         commandSequence = false;
                         waitForSequence = true;
+                        startedWaitingTime = System.currentTimeMillis();
                         whiteCount = 0;
                         plottingSignal = false;
                     } else if (commandWhiteAlign) {
@@ -256,9 +258,19 @@ public class BrickoporeServer extends Thread {
 
                                         signalPanel.repaint();
                                     }
+                                } else {
+                                    System.out.println("Packet didn't begin with ! character");
                                 }
                             } else {
-                                System.out.println("Packet didn't begin with ! character");
+                                // Check waiting too long
+                                if (System.currentTimeMillis() > (startedWaitingTime + 3000)) {
+                                    System.out.println("Something went wrong - no reply received in 3s. Trying to recover.");
+                                    waitForSequence = false;
+                                    parentFrame.setMiniFigureState(false);
+                                    parentFrame.setSequenceButtonEnabled(true);
+                                    cheeringStopTime = 0;
+                                    resultsTime = 0;
+                                }
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
