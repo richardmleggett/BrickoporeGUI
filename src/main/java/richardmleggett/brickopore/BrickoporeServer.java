@@ -169,6 +169,8 @@ public class BrickoporeServer extends Thread {
                 socket = server.accept();
                 System.out.println("Client accepted");
 
+                System.out.println("Timeout is set to " + socket.getSoTimeout());
+                
                 // takes input from the client socket
                 in = new DataInputStream(new BufferedInputStream(socket.getInputStream()));
                 out = new DataOutputStream(new BufferedOutputStream(socket.getOutputStream()));
@@ -185,6 +187,7 @@ public class BrickoporeServer extends Thread {
                         out_buffer[3] = 0;
                         out.write(out_buffer, 0, 4);
                         out.flush();
+                        System.out.println("Sent command");
                         commandSequence = false;
                         waitForSequence = true;
                         startedWaitingTime = System.currentTimeMillis();
@@ -198,6 +201,7 @@ public class BrickoporeServer extends Thread {
                         out_buffer[3] = 0;
                         out.write(out_buffer, 0, 4);
                         out.flush();
+                        System.out.println("Sent command");
                         commandWhiteAlign = false;
                     } else if (commandTerminate) {
                         out_buffer[0] = '!';
