@@ -385,7 +385,7 @@ public class BrickoporeServer extends Thread {
 
         signalPanel.setSequence(read);
         parentFrame.setMiniFigureState(true);
-        cheeringStopTime = System.currentTimeMillis() + 3000; 
+        cheeringStopTime = System.currentTimeMillis() + 4500; 
         resultsTime = System.currentTimeMillis() + 1000;
     }
     
