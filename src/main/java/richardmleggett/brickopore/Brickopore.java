@@ -42,6 +42,7 @@ public class Brickopore extends javax.swing.JFrame {
     private String urlDir = "";
     private boolean scientistsAreCheering = false;
     private boolean debugEnabled = false;
+    private boolean debugging = false;
     
     /**
      * Creates new form JLegoPore
@@ -91,6 +92,7 @@ public class Brickopore extends javax.swing.JFrame {
         saveURLButton = new javax.swing.JButton();
         debugButton = new javax.swing.JButton();
         beeTrailCheckbox = new javax.swing.JCheckBox();
+        resetButton = new javax.swing.JButton();
         signalPanel1 = new richardmleggett.brickopore.SignalPanel();
         filler1 = new javax.swing.Box.Filler(new java.awt.Dimension(0, 0), new java.awt.Dimension(0, 0), new java.awt.Dimension(32767, 32767));
         scientistsLabel = new javax.swing.JLabel();
@@ -175,6 +177,13 @@ public class Brickopore extends javax.swing.JFrame {
             }
         });
 
+        resetButton.setText("Reset");
+        resetButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                resetButtonActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
         buttonPanel.setLayout(buttonPanelLayout);
         buttonPanelLayout.setHorizontalGroup(
@@ -202,7 +211,9 @@ public class Brickopore extends javax.swing.JFrame {
                 .addComponent(beeTrailCheckbox)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(debugButton)
-                .addContainerGap(383, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(resetButton)
+                .addContainerGap(321, Short.MAX_VALUE))
         );
         buttonPanelLayout.setVerticalGroup(
             buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -219,7 +230,8 @@ public class Brickopore extends javax.swing.JFrame {
                     .addComponent(blastButton)
                     .addComponent(saveURLButton)
                     .addComponent(debugButton)
-                    .addComponent(beeTrailCheckbox))
+                    .addComponent(beeTrailCheckbox)
+                    .addComponent(resetButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -415,6 +427,8 @@ public class Brickopore extends javax.swing.JFrame {
     }//GEN-LAST:event_portTextFieldActionPerformed
 
     private void debugButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugButtonActionPerformed
+        debugging=true;
+        System.out.println("Debug enabled");
         server = new BrickoporeServer(this);
         server.start();
         signalPanel1.setServer(server);
@@ -423,6 +437,16 @@ public class Brickopore extends javax.swing.JFrame {
     private void beeTrailCheckboxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_beeTrailCheckboxActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_beeTrailCheckboxActionPerformed
+
+    private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
+        // TODO add your handling code here:
+        System.out.println("Reset");
+        setSequenceButtonEnabled(true);
+        setMiniFigureState(false);
+        if (server != null) {
+            server.reset();
+        }
+    }//GEN-LAST:event_resetButtonActionPerformed
 
     public void toggleMiniFigureState() {
         if (scientistsAreCheering == true) {
@@ -529,6 +553,7 @@ public class Brickopore extends javax.swing.JFrame {
     private javax.swing.JButton nudgeBackButton;
     private javax.swing.JButton nudgeFwdButton;
     private javax.swing.JTextField portTextField;
+    private javax.swing.JButton resetButton;
     private javax.swing.JButton saveURLButton;
     private javax.swing.JLabel scientistsLabel;
     private javax.swing.JButton sequenceButton;

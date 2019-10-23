@@ -114,7 +114,6 @@ public class BrickoporeServer extends Thread {
         System.out.println("Clicked sequence");
         signalPanel.clearSignalPlot();
         signalPanel.setIsBeeTrail(isBeeTrail);
-        commandSequence = true;
         
         if (debugging == true) {
             Random rand = new Random();
@@ -134,6 +133,9 @@ public class BrickoporeServer extends Thread {
             parentFrame.setMiniFigureState(true);
             cheeringStopTime = System.currentTimeMillis() + 3000;  
             resultsTime = System.currentTimeMillis() + 1000;
+        } else {
+            System.out.println("Debugging not true");
+            commandSequence = true;
         }
     }
     
@@ -310,14 +312,16 @@ public class BrickoporeServer extends Thread {
                 }
                 
                 if (System.currentTimeMillis() > (lastActivity + 60000)) {
-                    out_buffer[0] = '!';
-                    out_buffer[1] = 'P';
-                    out_buffer[2] = 'G';
-                    out_buffer[3] = 9;
-                    out.write(out_buffer, 0, 4);
-                    System.out.println("Sent ping");
-                    out.flush();
-                    lastActivity = System.currentTimeMillis();
+                    if (debugging == false) {
+                        out_buffer[0] = '!';
+                        out_buffer[1] = 'P';
+                        out_buffer[2] = 'G';
+                        out_buffer[3] = 9;
+                        out.write(out_buffer, 0, 4);
+                        System.out.println("Sent ping");
+                        out.flush();
+                        lastActivity = System.currentTimeMillis();
+                    }
                 }
                 
                 try {
@@ -431,5 +435,14 @@ public class BrickoporeServer extends Thread {
     
     public String getRead() {
         return read;
+    }
+    
+    public void reset() {
+        System.out.println("Reset server");
+        cheeringStopTime = 0;
+        resultsTime = 0;
+        startedWaitingTime = 0;
+        lastActivity = 0;
+        waitForSequence = false;
     }
 }
