@@ -206,7 +206,6 @@
         </Component>
         <Component class="javax.swing.JCheckBox" name="beeTrailCheckbox">
           <Properties>
-            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Bee trail"/>
           </Properties>
           <Events>

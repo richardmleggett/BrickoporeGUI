@@ -169,7 +169,6 @@ public class Brickopore extends javax.swing.JFrame {
             }
         });
 
-        beeTrailCheckbox.setSelected(true);
         beeTrailCheckbox.setText("Bee trail");
         beeTrailCheckbox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
