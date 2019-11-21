@@ -36,6 +36,7 @@ public class BrickoporeServer extends Thread {
     byte[] out_buffer = new byte [256];
     boolean running = true;
     private int maxBufferSize = 20000;
+    private boolean isBeeTrail = false;
 
     /* Default colours
     private final static String colours[] =     {"?",  "BLACK", "BLUE", "GREEN", "YELLOW", "RED", "WHITE", "BROWN" };
@@ -110,8 +111,9 @@ public class BrickoporeServer extends Thread {
         commandTerminate = true;
     }
     
-    public void sequenceClicked(boolean isBeeTrail) {
+    public void sequenceClicked(boolean ibt) {
         System.out.println("Clicked sequence");
+        isBeeTrail = ibt;
         signalPanel.clearSignalPlot();
         signalPanel.setIsBeeTrail(isBeeTrail);
         
@@ -298,7 +300,9 @@ public class BrickoporeServer extends Thread {
                 
                 if (resultsTime != 0) {
                     if (System.currentTimeMillis() > resultsTime) {
-                        parentFrame.showResults();
+                        if (isBeeTrail) {
+                            parentFrame.showResults();
+                        }
                         resultsTime = 0;
                     }
                 }
