@@ -31,26 +31,28 @@ import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.datatransfer.StringSelection;
+import java.awt.Toolkit;
+import java.awt.datatransfer.Clipboard;
 
 /**
- *
  * @author leggettr
  */
-public class Brickopore extends javax.swing.JFrame {  
+public class Brickopore extends javax.swing.JFrame {
     private String prefsFile = System.getProperty("user.home") + File.separator + ".brickopore.prefs";
-    private BrickoporeServer server=null;
+    private BrickoporeServer server = null;
     private String urlDir = "";
     private boolean scientistsAreCheering = false;
     private boolean debugEnabled = false;
     private boolean debugging = false;
-    
+
     /**
      * Creates new form JLegoPore
      */
     public Brickopore() {
         super("Brickopore");
-        initComponents();        
-        this.setPreferredSize(new Dimension(1000,800));
+        initComponents();
+        this.setPreferredSize(new Dimension(1000, 800));
         System.out.println(scientistsLabel.getIcon());
         readOptions();
         if (debugEnabled == false) {
@@ -61,16 +63,16 @@ public class Brickopore extends javax.swing.JFrame {
     /**
      * Centres a window on the screen.
      *
-     * @param  w the window to centre
+     * @param w the window to centre
      */
     public static void centreWindow(Window w) {
-         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-         Rectangle frameSize = w.getBounds();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Rectangle frameSize = w.getBounds();
 
-         w.setLocation((screenSize.width - frameSize.width) / 2,
-                       (screenSize.height - frameSize.height) / 2);
-    }    
-    
+        w.setLocation((screenSize.width - frameSize.width) / 2,
+                (screenSize.height - frameSize.height) / 2);
+    }
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -90,6 +92,7 @@ public class Brickopore extends javax.swing.JFrame {
         nudgeFwdButton = new javax.swing.JButton();
         blastButton = new javax.swing.JButton();
         saveURLButton = new javax.swing.JButton();
+        copySequenceButton = new javax.swing.JButton();
         debugButton = new javax.swing.JButton();
         beeTrailCheckbox = new javax.swing.JCheckBox();
         resetButton = new javax.swing.JButton();
@@ -162,6 +165,13 @@ public class Brickopore extends javax.swing.JFrame {
             }
         });
 
+        copySequenceButton.setText("Copy Sequence");
+        copySequenceButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                copySequenceButtonActionPerformed(evt);
+            }
+        });
+
         debugButton.setText("Debug");
         debugButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -186,52 +196,55 @@ public class Brickopore extends javax.swing.JFrame {
         javax.swing.GroupLayout buttonPanelLayout = new javax.swing.GroupLayout(buttonPanel);
         buttonPanel.setLayout(buttonPanelLayout);
         buttonPanelLayout.setHorizontalGroup(
-            buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(startButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(stopButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(alignButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nudgeBackButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(nudgeFwdButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(blastButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(saveURLButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(beeTrailCheckbox)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(debugButton)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(resetButton)
-                .addContainerGap(321, Short.MAX_VALUE))
+                buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(startButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(stopButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(alignButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(nudgeBackButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(nudgeFwdButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(blastButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(saveURLButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(copySequenceButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(beeTrailCheckbox)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(debugButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(resetButton)
+                                .addContainerGap(321, Short.MAX_VALUE))
         );
         buttonPanelLayout.setVerticalGroup(
-            buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(buttonPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(startButton)
-                    .addComponent(stopButton)
-                    .addComponent(alignButton)
-                    .addComponent(nudgeBackButton)
-                    .addComponent(nudgeFwdButton)
-                    .addComponent(blastButton)
-                    .addComponent(saveURLButton)
-                    .addComponent(debugButton)
-                    .addComponent(beeTrailCheckbox)
-                    .addComponent(resetButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(buttonPanelLayout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(buttonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                        .addComponent(jLabel1)
+                                        .addComponent(portTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(startButton)
+                                        .addComponent(stopButton)
+                                        .addComponent(alignButton)
+                                        .addComponent(nudgeBackButton)
+                                        .addComponent(nudgeFwdButton)
+                                        .addComponent(blastButton)
+                                        .addComponent(saveURLButton)
+                                        .addComponent(copySequenceButton)
+                                        .addComponent(debugButton)
+                                        .addComponent(beeTrailCheckbox)
+                                        .addComponent(resetButton))
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         signalPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -239,17 +252,17 @@ public class Brickopore extends javax.swing.JFrame {
         javax.swing.GroupLayout signalPanel1Layout = new javax.swing.GroupLayout(signalPanel1);
         signalPanel1.setLayout(signalPanel1Layout);
         signalPanel1Layout.setHorizontalGroup(
-            signalPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, signalPanel1Layout.createSequentialGroup()
-                .addGap(0, 1134, Short.MAX_VALUE)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                signalPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, signalPanel1Layout.createSequentialGroup()
+                                .addGap(0, 1134, Short.MAX_VALUE)
+                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         signalPanel1Layout.setVerticalGroup(
-            signalPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(signalPanel1Layout.createSequentialGroup()
-                .addGap(219, 219, 219)
-                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(250, Short.MAX_VALUE))
+                signalPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(signalPanel1Layout.createSequentialGroup()
+                                .addGap(219, 219, 219)
+                                .addComponent(filler1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(250, Short.MAX_VALUE))
         );
 
         scientistsLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/sci3.png"))); // NOI18N
@@ -271,56 +284,56 @@ public class Brickopore extends javax.swing.JFrame {
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(sequenceButton)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(sequenceButton)
+                                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(sequenceButton)
-                .addContainerGap())
+                jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(sequenceButton)
+                                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(brickoporeLabel)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(scientistsLabel))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addGap(0, 0, Short.MAX_VALUE)
-                .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(brickoporeLabel)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(scientistsLabel))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(scientistsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addComponent(brickoporeLabel)
-                        .addContainerGap())))
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(buttonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(signalPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 47, Short.MAX_VALUE)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(scientistsLabel, javax.swing.GroupLayout.Alignment.TRAILING)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(brickoporeLabel)
+                                                .addContainerGap())))
         );
 
         pack();
@@ -331,6 +344,22 @@ public class Brickopore extends javax.swing.JFrame {
         toggleMiniFigureState();
 
     }//GEN-LAST:event_scientistsLabelMouseClicked
+
+    /**
+     * @author MrTomRod
+     */
+    private void copySequenceButtonActionPerformed(java.awt.event.ActionEvent evt) {
+        // Read sequence
+        String read = "NNNNNNNNNN";
+        if (server != null) {
+            read = server.getRead();
+        }
+
+        // Copy sequence to clipboard
+        StringSelection stringSelection = new StringSelection(read);
+        Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
+        clipboard.setContents(stringSelection, null);
+    }
 
     private void saveURLButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveURLButtonActionPerformed
         JFileChooser jfc = new JFileChooser();
@@ -359,7 +388,7 @@ public class Brickopore extends javax.swing.JFrame {
                 }
 
                 pw.println("[InternetShortcut]");
-                pw.println("URL=https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY="+read);
+                pw.println("URL=https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY=" + read);
                 pw.close();
             } catch (IOException e) {
                 System.out.println("Exception:");
@@ -373,7 +402,7 @@ public class Brickopore extends javax.swing.JFrame {
 
     private void blastButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_blastButtonActionPerformed
         try {
-            java.awt.Desktop.getDesktop().browse(new URI("https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY="+server.getRead()));
+            java.awt.Desktop.getDesktop().browse(new URI("https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&PAGE_TYPE=BlastSearch&LINK_LOC=blasthome&QUERY=" + server.getRead()));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -401,7 +430,7 @@ public class Brickopore extends javax.swing.JFrame {
         if (server == null) {
             System.out.println("ERROR!");
         }
-        
+
         server.sequenceClicked(beeTrailCheckbox.isSelected());
     }//GEN-LAST:event_sequenceButtonActionPerformed
 
@@ -413,7 +442,7 @@ public class Brickopore extends javax.swing.JFrame {
 
     private void startButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startButtonActionPerformed
         int port = Integer.parseInt(portTextField.getText());
-        System.out.println("Got port "+port);
+        System.out.println("Got port " + port);
         startButton.setEnabled(false);
         stopButton.setEnabled(true);
         server = new BrickoporeServer(this, port);
@@ -426,7 +455,7 @@ public class Brickopore extends javax.swing.JFrame {
     }//GEN-LAST:event_portTextFieldActionPerformed
 
     private void debugButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_debugButtonActionPerformed
-        debugging=true;
+        debugging = true;
         System.out.println("Debug enabled");
         server = new BrickoporeServer(this);
         server.start();
@@ -454,19 +483,19 @@ public class Brickopore extends javax.swing.JFrame {
             setMiniFigureState(true);
         }
     }
-    
+
     public void setMiniFigureState(boolean cheering) {
         //String iconName = cheering ? "/Users/leggettr/Documents/NetBeansProjects/legopore/target/classes/sci4.png":"/Users/leggettr/Documents/NetBeansProjects/legopore/target/classes/sci3.png";
         //scientistsLabel.setIcon(new ImageIcon(iconName));
 
-        scientistsLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(cheering ? "/sci4.png":"/sci3.png")));
+        scientistsLabel.setIcon(new javax.swing.ImageIcon(getClass().getResource(cheering ? "/sci4.png" : "/sci3.png")));
         scientistsAreCheering = cheering;
     }
-    
+
     public void setSequenceButtonEnabled(boolean tf) {
         sequenceButton.setEnabled(tf);
     }
-    
+
     public void readOptions() {
         try {
             File f = new File(prefsFile);
@@ -475,8 +504,8 @@ public class Brickopore extends javax.swing.JFrame {
                 String line;
                 while ((line = br.readLine()) != null) {
                     if (line.startsWith("URLDir:")) {
-                        urlDir=line.substring(7);
-                        System.out.println("Got URLDir "+urlDir);
+                        urlDir = line.substring(7);
+                        System.out.println("Got URLDir " + urlDir);
                     }
                 }
                 br.close();
@@ -486,14 +515,14 @@ public class Brickopore extends javax.swing.JFrame {
             e.printStackTrace();
             System.exit(1);
         }
-        
+
     }
-    
+
     public void writeOptions() {
         try {
-            PrintWriter pw = new PrintWriter(new FileWriter(prefsFile)); 
+            PrintWriter pw = new PrintWriter(new FileWriter(prefsFile));
 
-            pw.println("URLDir:"+urlDir);
+            pw.println("URLDir:" + urlDir);
             pw.close();
         } catch (IOException e) {
             System.out.println("Exception:");
@@ -501,42 +530,42 @@ public class Brickopore extends javax.swing.JFrame {
             System.exit(1);
         }
     }
-    
+
     public void setDebugEnabled() {
         debugEnabled = true;
         debugButton.setVisible(true);
     }
-    
+
     public void showResults() {
         ResultsDialog rd = new ResultsDialog(this, true);
         rd.setSequence(server.getRead());
         centreWindow(rd);
         rd.show();
     }
-    
+
     public static void main(String[] args) {
         Brickopore jlp = new Brickopore();
-        
+
         System.out.println("Todo:");
         System.out.println("- Amino acid conversion");
-        
+
         centreWindow(jlp);
         jlp.setVisible(true);
-        
+
         if (args.length >= 1) {
             if (args[0].equals("debug")) {
                 jlp.setDebugEnabled();
             } else {
-                System.out.println("Unknown option "+args[0]);
+                System.out.println("Unknown option " + args[0]);
             }
         }
-        
+
         //if (args.length != 2) {
         //    System.out.println("Syntax: legopore <port>");
         //    System.exit(1);
         //}
-        
-        //port = Integer.parseInt(args[1]);        
+
+        //port = Integer.parseInt(args[1]);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -554,6 +583,7 @@ public class Brickopore extends javax.swing.JFrame {
     private javax.swing.JTextField portTextField;
     private javax.swing.JButton resetButton;
     private javax.swing.JButton saveURLButton;
+    private javax.swing.JButton copySequenceButton;
     private javax.swing.JLabel scientistsLabel;
     private javax.swing.JButton sequenceButton;
     private richardmleggett.brickopore.SignalPanel signalPanel1;
